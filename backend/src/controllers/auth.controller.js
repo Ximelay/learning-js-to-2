@@ -58,13 +58,14 @@ export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
     const [rows] = await pool.query(
-      'SELECT id, email, username, password_hash, role, total_score FROM users WHERE email = ? LIMIT 1',
+      'SELECT id, email, username, password_hash, role, total_score, is_blocked FROM users WHERE email = ? LIMIT 1',
       [email]
     );
     if (!rows.length) throw new ApiError(401, 'Неверный email или пароль');
     const u = rows[0];
     const ok = await bcrypt.compare(password, u.password_hash);
     if (!ok) throw new ApiError(401, 'Неверный email или пароль');
+    if (u.is_blocked) throw new ApiError(403, 'Аккаунт заблокирован администратором');
     const user = { id: u.id, email: u.email, username: u.username, role: u.role, total_score: u.total_score };
     setAuthCookie(res, issueToken(user));
     res.json({ user });

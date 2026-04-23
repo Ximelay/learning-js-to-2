@@ -225,13 +225,54 @@ export async function adminDeleteBadge(req, res, next) {
 
 // ========== USERS ==========
 
+export const userRoleSchema = z.object({
+  role: z.enum(['user', 'admin']),
+});
+
+export const userBlockSchema = z.object({
+  is_blocked: z.boolean(),
+});
+
 export async function adminListUsers(_req, res, next) {
   try {
     const [rows] = await pool.query(
-      `SELECT id, email, username, role, total_score, created_at,
+      `SELECT id, email, username, role, is_blocked, total_score, created_at,
               (SELECT COUNT(*) FROM user_task_progress utp WHERE utp.user_id = users.id AND utp.status = 'completed') AS tasks_completed
        FROM users ORDER BY created_at DESC`
     );
-    res.json({ users: rows });
+    res.json({ users: rows.map(u => ({ ...u, is_blocked: !!u.is_blocked })) });
+  } catch (e) { next(e); }
+}
+
+export async function adminUpdateUserRole(req, res, next) {
+  try {
+    const targetId = Number(req.params.id);
+    if (targetId === req.user.id) throw new ApiError(400, 'Нельзя изменить собственную роль');
+    const [r] = await pool.query('UPDATE users SET role = ? WHERE id = ?', [req.body.role, targetId]);
+    if (!r.affectedRows) throw new ApiError(404, 'Пользователь не найден');
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+}
+
+export async function adminSetUserBlocked(req, res, next) {
+  try {
+    const targetId = Number(req.params.id);
+    if (targetId === req.user.id) throw new ApiError(400, 'Нельзя заблокировать самого себя');
+    const [r] = await pool.query(
+      'UPDATE users SET is_blocked = ? WHERE id = ?',
+      [req.body.is_blocked ? 1 : 0, targetId]
+    );
+    if (!r.affectedRows) throw new ApiError(404, 'Пользователь не найден');
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+}
+
+export async function adminDeleteUser(req, res, next) {
+  try {
+    const targetId = Number(req.params.id);
+    if (targetId === req.user.id) throw new ApiError(400, 'Нельзя удалить самого себя');
+    const [r] = await pool.query('DELETE FROM users WHERE id = ?', [targetId]);
+    if (!r.affectedRows) throw new ApiError(404, 'Пользователь не найден');
+    res.json({ ok: true });
   } catch (e) { next(e); }
 }

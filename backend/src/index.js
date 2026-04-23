@@ -10,6 +10,7 @@ process.on('unhandledRejection', (reason) => {
   console.error('[unhandledRejection]', reason);
 });
 import { waitForDatabase } from './db/pool.js';
+import { runMigrations } from './db/migrations.js';
 import { ensureAdmin } from './db/ensureAdmin.js';
 import { seedContentIfEmpty } from './seeds/seedContent.js';
 import { syncBadges } from './seeds/seedBadges.js';
@@ -39,6 +40,7 @@ async function start() {
   console.log('[startup] Ожидание базы данных...');
   await waitForDatabase();
   console.log('[startup] База готова');
+  await runMigrations();
   await ensureAdmin();
   await seedContentIfEmpty();
   await syncBadges();

@@ -1,16 +1,33 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config.js';
 import { ApiError } from './error.js';
+import { pool } from '../db/pool.js';
 
-export function authRequired(req, _res, next) {
+export async function authRequired(req, res, next) {
   const token = req.cookies?.token;
   if (!token) return next(new ApiError(401, 'Требуется вход в систему'));
   try {
     const payload = jwt.verify(token, config.jwt.secret);
-    req.user = { id: payload.sub, role: payload.role, email: payload.email };
+    // Проверяем, что пользователь не заблокирован и роль актуальна.
+    const [[row]] = await pool.query(
+      'SELECT id, email, username, role, is_blocked FROM users WHERE id = ? LIMIT 1',
+      [payload.sub]
+    );
+    if (!row) {
+      res.clearCookie('token');
+      return next(new ApiError(401, 'Аккаунт не найден'));
+    }
+    if (row.is_blocked) {
+      res.clearCookie('token');
+      return next(new ApiError(403, 'Аккаунт заблокирован администратором'));
+    }
+    req.user = { id: row.id, role: row.role, email: row.email, username: row.username };
     next();
-  } catch {
-    next(new ApiError(401, 'Недействительный токен, войдите заново'));
+  } catch (e) {
+    if (e.name === 'JsonWebTokenError' || e.name === 'TokenExpiredError') {
+      return next(new ApiError(401, 'Недействительный токен, войдите заново'));
+    }
+    next(e);
   }
 }
 

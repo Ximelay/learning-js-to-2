@@ -7,7 +7,7 @@
 - **Frontend:** React 18 + Vite, CodeMirror 6, React Router
 - **Backend:** Node.js + Express, JWT в httpOnly-cookie
 - **БД:** MySQL 8
-- **Песочница проверки кода:** `isolated-vm` (V8-изоляты внутри контейнера бэкенда)
+- **Песочница проверки кода:** `node 8` (V8-изоляты внутри контейнера бэкенда)
 - **PDF-сертификаты:** `pdfkit`, файлы лежат в `backend/certificates/`
 - **Оркестрация:** Docker + docker-compose
 

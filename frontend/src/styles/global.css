@@ -447,3 +447,55 @@ a { color: inherit; }
   overflow-y: auto;
 }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+/* ========== Markdown editor ========== */
+.md-editor { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.md-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+  background: var(--panel-2);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.md-btn {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.md-btn:hover { background: var(--panel-2); }
+.md-tabs { margin-left: auto; display: flex; gap: 2px; }
+.md-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: inherit;
+}
+.md-tab.active { background: white; border-color: var(--line); color: var(--ink); font-weight: 600; }
+
+.md-body { display: grid; }
+.md-body.md-edit { grid-template-columns: 1fr; }
+.md-body.md-preview { grid-template-columns: 1fr; }
+.md-body.md-split { grid-template-columns: 1fr 1fr; }
+.md-edit-pane { border-right: 1px solid var(--line); }
+.md-body.md-edit .md-edit-pane { border-right: none; }
+.md-preview-pane { padding: 12px 16px; background: #fcfdfd; }
+.md-preview-content { background: transparent !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; }
+
+/* ========== Admin badges/chips ========== */
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+.chip-admin    { background: #ede4ff; color: #4a2ab2; }
+.chip-user     { background: #e1ecf2; color: #33596b; }
+.chip-blocked  { background: #fde2dd; color: #8a2015; }
+.chip-active   { background: #e9f6ec; color: #0b5b2b; }
+.row-self      { background: #fffdf0; }
+
+.btn-sm { padding: 4px 9px; font-size: 12px; border-radius: 6px; }
+.actions-cell { display: flex; gap: 4px; flex-wrap: wrap; }
