@@ -1,0 +1,19 @@
+{
+  "name": "website-yana",
+  "version": "1.0.0",
+  "description": "Образовательный веб-квест для изучения синтаксиса JavaScript",
+  "private": true,
+  "scripts": {
+    "up": "docker compose --env-file .env up --build",
+    "up:d": "docker compose --env-file .env up -d --build",
+    "down": "docker compose down",
+    "logs": "docker compose logs -f",
+    "logs:backend": "docker compose logs -f backend",
+    "logs:frontend": "docker compose logs -f frontend",
+    "db:shell": "docker compose exec mysql mysql -u${MYSQL_USER:-jsquest} -p${MYSQL_PASSWORD:-jsquestpass} ${MYSQL_DATABASE:-jsquest}",
+    "reset": "docker compose down -v && docker compose --env-file .env up --build"
+  },
+  "keywords": ["javascript", "education", "quest", "react", "mysql"],
+  "author": "",
+  "license": "ISC"
+}
