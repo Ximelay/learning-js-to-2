@@ -12,3 +12,4 @@ database/data/
 coverage/
 /.idea/
 /frontend/package-lock.json
+/tests/package-lock.json

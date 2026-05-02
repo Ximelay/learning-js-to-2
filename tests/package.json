@@ -1,0 +1,16 @@
+{
+  "name": "jsquest-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:unit": "node --env-file-if-exists=../.env --env-file-if-exists=.env --test 'unit/**/*.test.js'",
+    "test:integration": "node --env-file-if-exists=../.env --env-file-if-exists=.env --test 'integration/**/*.test.js'",
+    "test:ui": "node --env-file-if-exists=../.env --env-file-if-exists=.env --test --test-timeout=120000 'ui/**/*.test.js'",
+    "test": "npm run test:unit && npm run test:integration && npm run test:ui"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.27.0",
+    "zod": "^3.23.8"
+  }
+}
