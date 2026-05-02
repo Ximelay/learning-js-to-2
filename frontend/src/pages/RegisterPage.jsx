@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', username: '', password: '' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const on = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -16,13 +16,28 @@ export default function RegisterPage() {
     setErr(''); setBusy(true);
     try {
       await register(form.email, form.username, form.password);
-      navigate('/');
+      setSubmitted(true);
     } catch (e) {
       setErr(e.message || 'Ошибка регистрации');
     } finally {
       setBusy(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <div className="panel" style={{ maxWidth: 460, margin: '40px auto' }}>
+        <h2 className="panel-title">Заявка отправлена</h2>
+        <p>
+          Спасибо за регистрацию! Ваш аккаунт ожидает одобрения администратора.
+          После подтверждения вы сможете войти, используя свой email и пароль.
+        </p>
+        <p style={{ marginTop: 16 }}>
+          <Link to="/login" className="btn btn-primary">К странице входа</Link>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="panel" style={{ maxWidth: 460, margin: '40px auto' }}>
@@ -42,6 +57,9 @@ export default function RegisterPage() {
           {busy ? 'Создаём...' : 'Зарегистрироваться'}
         </button>
       </form>
+      <p style={{ marginTop: 12, color: 'var(--muted)', fontSize: 13 }}>
+        После регистрации аккаунт нужно подтвердить администратору — войти можно будет только после одобрения.
+      </p>
       <p style={{ marginTop: 16, color: 'var(--muted)' }}>
         Уже есть аккаунт? <Link to="/login">Войти</Link>
       </p>

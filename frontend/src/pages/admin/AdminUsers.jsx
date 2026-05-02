@@ -39,6 +39,13 @@ export default function AdminUsers() {
     withBusy(u.id, () => api.patch(`/admin/users/${u.id}/block`, { is_blocked: !u.is_blocked }));
   };
 
+  const toggleApproval = (u) => {
+    if (u.id === me?.id) return;
+    const action = u.is_approved ? 'отозвать одобрение у' : 'одобрить';
+    if (!confirm(`${action[0].toUpperCase()}${action.slice(1)} пользователя ${u.username}?`)) return;
+    withBusy(u.id, () => api.patch(`/admin/users/${u.id}/approve`, { is_approved: !u.is_approved }));
+  };
+
   const toggleRole = (u) => {
     if (u.id === me?.id) return;
     const nextRole = u.role === 'admin' ? 'user' : 'admin';
@@ -67,7 +74,7 @@ export default function AdminUsers() {
       <table className="admin-table">
         <thead>
           <tr>
-            <th>ID</th><th>Email</th><th>Имя</th><th>Роль</th><th>Статус</th>
+            <th>ID</th><th>Email</th><th>Имя</th><th>Роль</th><th>Одобрение</th><th>Статус</th>
             <th>Баллы</th><th>Задач</th><th>Создан</th><th>Действия</th>
           </tr>
         </thead>
@@ -84,6 +91,11 @@ export default function AdminUsers() {
                   <span className={`chip chip-${u.role}`}>{u.role === 'admin' ? '👑 admin' : 'user'}</span>
                 </td>
                 <td>
+                  {u.is_approved
+                    ? <span className="chip chip-active">одобрен</span>
+                    : <span className="chip chip-pending">⏳ ожидает</span>}
+                </td>
+                <td>
                   {u.is_blocked
                     ? <span className="chip chip-blocked">🚫 заблокирован</span>
                     : <span className="chip chip-active">активен</span>}
@@ -94,6 +106,14 @@ export default function AdminUsers() {
                 <td className="actions-cell">
                   {!isMe && (
                     <>
+                      <button
+                        className={`btn btn-sm ${u.is_approved ? 'btn-ghost' : 'btn-primary'}`}
+                        onClick={() => toggleApproval(u)}
+                        disabled={isBusy}
+                        title={u.is_approved ? 'Отозвать одобрение' : 'Одобрить аккаунт'}
+                      >
+                        {u.is_approved ? 'Отозвать' : 'Одобрить'}
+                      </button>
                       <button
                         className={`btn btn-sm ${u.is_blocked ? 'btn-primary' : 'btn-ghost'}`}
                         onClick={() => toggleBlock(u)}
@@ -125,7 +145,7 @@ export default function AdminUsers() {
             );
           })}
           {filtered.length === 0 && (
-            <tr><td colSpan="9" style={{ textAlign: 'center', color: 'var(--muted)' }}>
+            <tr><td colSpan="10" style={{ textAlign: 'center', color: 'var(--muted)' }}>
               {q ? 'По вашему запросу никого не найдено' : 'Пользователей ещё нет'}
             </td></tr>
           )}

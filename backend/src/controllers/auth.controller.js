@@ -43,14 +43,14 @@ export async function register(req, res, next) {
     if (existing.length) throw new ApiError(409, 'Пользователь с таким email или именем уже зарегистрирован');
 
     const hash = await bcrypt.hash(password, 10);
-    const [result] = await pool.query(
-      'INSERT INTO users (email, username, password_hash, role) VALUES (?, ?, ?, ?)',
+    await pool.query(
+      'INSERT INTO users (email, username, password_hash, role, is_approved) VALUES (?, ?, ?, ?, 0)',
       [email, username, hash, 'user']
     );
-    const user = { id: result.insertId, email, username, role: 'user', total_score: 0 };
-    const token = issueToken(user);
-    setAuthCookie(res, token);
-    res.status(201).json({ user });
+    res.status(201).json({
+      pending: true,
+      message: 'Регистрация принята. Аккаунт будет доступен после одобрения администратором.',
+    });
   } catch (e) { next(e); }
 }
 
@@ -58,7 +58,7 @@ export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
     const [rows] = await pool.query(
-      'SELECT id, email, username, password_hash, role, total_score, is_blocked FROM users WHERE email = ? LIMIT 1',
+      'SELECT id, email, username, password_hash, role, total_score, is_blocked, is_approved FROM users WHERE email = ? LIMIT 1',
       [email]
     );
     if (!rows.length) throw new ApiError(401, 'Неверный email или пароль');
@@ -66,6 +66,7 @@ export async function login(req, res, next) {
     const ok = await bcrypt.compare(password, u.password_hash);
     if (!ok) throw new ApiError(401, 'Неверный email или пароль');
     if (u.is_blocked) throw new ApiError(403, 'Аккаунт заблокирован администратором');
+    if (!u.is_approved) throw new ApiError(403, 'Аккаунт ожидает одобрения администратора');
     const user = { id: u.id, email: u.email, username: u.username, role: u.role, total_score: u.total_score };
     setAuthCookie(res, issueToken(user));
     res.json({ user });
