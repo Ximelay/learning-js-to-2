@@ -7,7 +7,7 @@ export async function ensureAdmin() {
   if (rows.length) return;
   const hash = await bcrypt.hash(config.admin.password, 10);
   await pool.query(
-    'INSERT INTO users (email, username, password_hash, role) VALUES (?, ?, ?, "admin")',
+    'INSERT INTO users (email, username, password_hash, role, is_approved) VALUES (?, ?, ?, "admin", 1)',
     [config.admin.email, 'admin', hash]
   );
   console.log(`[seed] admin user создан: ${config.admin.email}`);

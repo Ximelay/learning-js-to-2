@@ -495,6 +495,7 @@ a { color: inherit; }
 .chip-user     { background: #e1ecf2; color: #33596b; }
 .chip-blocked  { background: #fde2dd; color: #8a2015; }
 .chip-active   { background: #e9f6ec; color: #0b5b2b; }
+.chip-pending  { background: #fff4d6; color: #7a5200; }
 .row-self      { background: #fffdf0; }
 
 .btn-sm { padding: 4px 9px; font-size: 12px; border-radius: 6px; }

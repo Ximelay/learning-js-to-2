@@ -27,9 +27,8 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (email, username, password) => {
-    const { user } = await api.post('/auth/register', { email, username, password });
-    setUser(user);
-    return user;
+    // Регистрация не выдаёт токен: аккаунт ждёт одобрения администратора.
+    return await api.post('/auth/register', { email, username, password });
   };
 
   const logout = async () => {

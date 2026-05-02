@@ -10,7 +10,7 @@ export async function authRequired(req, res, next) {
     const payload = jwt.verify(token, config.jwt.secret);
     // Проверяем, что пользователь не заблокирован и роль актуальна.
     const [[row]] = await pool.query(
-      'SELECT id, email, username, role, is_blocked FROM users WHERE id = ? LIMIT 1',
+      'SELECT id, email, username, role, is_blocked, is_approved FROM users WHERE id = ? LIMIT 1',
       [payload.sub]
     );
     if (!row) {
@@ -20,6 +20,10 @@ export async function authRequired(req, res, next) {
     if (row.is_blocked) {
       res.clearCookie('token');
       return next(new ApiError(403, 'Аккаунт заблокирован администратором'));
+    }
+    if (!row.is_approved) {
+      res.clearCookie('token');
+      return next(new ApiError(403, 'Аккаунт ожидает одобрения администратора'));
     }
     req.user = { id: row.id, role: row.role, email: row.email, username: row.username };
     next();

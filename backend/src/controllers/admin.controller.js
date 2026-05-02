@@ -233,14 +233,24 @@ export const userBlockSchema = z.object({
   is_blocked: z.boolean(),
 });
 
+export const userApprovalSchema = z.object({
+  is_approved: z.boolean(),
+});
+
 export async function adminListUsers(_req, res, next) {
   try {
     const [rows] = await pool.query(
-      `SELECT id, email, username, role, is_blocked, total_score, created_at,
+      `SELECT id, email, username, role, is_blocked, is_approved, total_score, created_at,
               (SELECT COUNT(*) FROM user_task_progress utp WHERE utp.user_id = users.id AND utp.status = 'completed') AS tasks_completed
-       FROM users ORDER BY created_at DESC`
+       FROM users ORDER BY is_approved ASC, created_at DESC`
     );
-    res.json({ users: rows.map(u => ({ ...u, is_blocked: !!u.is_blocked })) });
+    res.json({
+      users: rows.map(u => ({
+        ...u,
+        is_blocked: !!u.is_blocked,
+        is_approved: !!u.is_approved,
+      })),
+    });
   } catch (e) { next(e); }
 }
 
@@ -261,6 +271,19 @@ export async function adminSetUserBlocked(req, res, next) {
     const [r] = await pool.query(
       'UPDATE users SET is_blocked = ? WHERE id = ?',
       [req.body.is_blocked ? 1 : 0, targetId]
+    );
+    if (!r.affectedRows) throw new ApiError(404, 'Пользователь не найден');
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+}
+
+export async function adminSetUserApproval(req, res, next) {
+  try {
+    const targetId = Number(req.params.id);
+    if (targetId === req.user.id) throw new ApiError(400, 'Нельзя изменить статус одобрения своего аккаунта');
+    const [r] = await pool.query(
+      'UPDATE users SET is_approved = ? WHERE id = ?',
+      [req.body.is_approved ? 1 : 0, targetId]
     );
     if (!r.affectedRows) throw new ApiError(404, 'Пользователь не найден');
     res.json({ ok: true });

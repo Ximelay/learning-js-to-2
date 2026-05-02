@@ -6,7 +6,8 @@ import {
   adminListTasks, adminGetTask, adminCreateTask, adminUpdateTask, adminDeleteTask, taskSchema,
   adminCreateTestCase, adminUpdateTestCase, adminDeleteTestCase, testCaseSchema,
   adminListBadges, adminCreateBadge, adminUpdateBadge, adminDeleteBadge, badgeSchema,
-  adminListUsers, adminUpdateUserRole, adminSetUserBlocked, adminDeleteUser, userRoleSchema, userBlockSchema,
+  adminListUsers, adminUpdateUserRole, adminSetUserBlocked, adminSetUserApproval, adminDeleteUser,
+  userRoleSchema, userBlockSchema, userApprovalSchema,
 } from '../controllers/admin.controller.js';
 
 const router = Router();
@@ -36,6 +37,7 @@ router.delete('/badges/:id',  adminDeleteBadge);
 router.get('/users',             adminListUsers);
 router.patch('/users/:id/role',  validate(userRoleSchema),  adminUpdateUserRole);
 router.patch('/users/:id/block', validate(userBlockSchema), adminSetUserBlocked);
+router.patch('/users/:id/approve', validate(userApprovalSchema), adminSetUserApproval);
 router.delete('/users/:id',      adminDeleteUser);
 
 export default router;

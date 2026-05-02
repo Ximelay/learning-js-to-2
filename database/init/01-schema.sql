@@ -10,6 +10,7 @@ CREATE TABLE users (
   password_hash VARCHAR(255) NOT NULL,
   role          ENUM('user','admin') NOT NULL DEFAULT 'user',
   is_blocked    TINYINT(1)   NOT NULL DEFAULT 0,
+  is_approved   TINYINT(1)   NOT NULL DEFAULT 0,
   total_score   INT UNSIGNED NOT NULL DEFAULT 0,
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
