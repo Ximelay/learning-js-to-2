@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function LoginPage() {
@@ -38,8 +38,8 @@ export default function LoginPage() {
           {busy ? 'Входим...' : 'Войти'}
         </button>
       </form>
-      <p style={{ marginTop: 16, color: 'var(--muted)' }}>
-        Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+      <p style={{ marginTop: 16, color: 'var(--muted)', fontSize: 13 }}>
+        Учётные записи создаёт администратор. Если у вас ещё нет логина — обратитесь к преподавателю.
       </p>
     </div>
   );

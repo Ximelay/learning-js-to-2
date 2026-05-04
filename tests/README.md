@@ -1,12 +1,12 @@
 # Тесты JS-Квеста
 
-Покрытие: фича одобрения регистрации администратором.
+Покрытие: создание учётных записей только администратором (публичной регистрации нет).
 
 | Уровень       | Файл                                              | Что проверяется |
 |---------------|---------------------------------------------------|-----------------|
-| Unit          | `unit/auth.schema.test.js`                        | Валидация Zod-схем `registerSchema`, `userApprovalSchema` |
-| Integration   | `integration/approval-flow.test.js`               | HTTP-API: register → 403 на login → admin approve → login OK |
-| UI (Selenium) | `ui/approval-flow.test.js`                        | Браузерный сценарий: экран ожидания, ошибка входа, одобрение в админке |
+| Unit          | `unit/auth.schema.test.js`                        | Валидация Zod-схем `userCreateSchema`, `userApprovalSchema` |
+| Integration   | `integration/approval-flow.test.js`               | HTTP-API: `POST /auth/register` отсутствует, админ создаёт пользователя через `POST /admin/users`, тот логинится сгенерированным паролем |
+| UI (Selenium) | `ui/approval-flow.test.js`                        | Браузерный сценарий: на `/register` фолбэк, в админке модалка создания и показ пароля |
 
 ## Установка
 

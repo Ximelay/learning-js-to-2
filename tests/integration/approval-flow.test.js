@@ -16,62 +16,48 @@ before(async () => {
 });
 
 after(async () => {
-  // подчищаем тестовых пользователей, чтобы тесты были идемпотентны
   for (const email of createdEmails) {
     try { await deleteUserByEmail(admin, email); } catch { /* ignore */ }
   }
 });
 
-test('POST /auth/register создаёт пользователя в статусе ожидания и не выдаёт токен', async () => {
-  const u = uniqueUser('reg');
+test('POST /admin/users без авторизации админа отклоняется', async () => {
+  const u = uniqueUser('anon');
+  const anon = createApiClient();
+  const res = await anon.post('/admin/users', { email: u.email, username: u.username });
+  // authRequired срабатывает первым → 401
+  assert.equal(res.status, 401);
+});
+
+test('POST /admin/users создаёт одобренного пользователя и возвращает сгенерированный пароль', async () => {
+  const u = uniqueUser('create');
   createdEmails.push(u.email);
-  const client = createApiClient();
-  const res = await client.post('/auth/register', u);
+  const res = await admin.post('/admin/users', { email: u.email, username: u.username });
 
   assert.equal(res.status, 201);
-  assert.equal(res.data.pending, true);
-  assert.match(res.data.message, /одобрения/);
-  // токен в куках выдан НЕ должен быть
-  assert.equal(client.cookie(), '');
+  assert.equal(res.data.user.email, u.email);
+  assert.equal(res.data.user.username, u.username);
+  assert.equal(res.data.user.role, 'user');
+  assert.equal(res.data.user.is_approved, true);
+  assert.equal(typeof res.data.password, 'string');
+  assert.ok(res.data.password.length >= 12, 'Пароль должен быть не короче 12 символов');
 
-  // и в админ-списке он виден как неодобренный
-  const found = await findUserByEmail(admin, u.email);
-  assert.ok(found, 'Зарегистрированный пользователь должен появиться в админ-списке');
-  assert.equal(found.is_approved, false);
-});
-
-test('POST /auth/login отклоняет неодобренного пользователя с 403', async () => {
-  const u = uniqueUser('unapproved');
-  createdEmails.push(u.email);
-  const client = createApiClient();
-  await client.post('/auth/register', u);
-
-  const res = await client.post('/auth/login', { email: u.email, password: u.password });
-  assert.equal(res.status, 403);
-  assert.match(res.data.error, /ожидает одобрения/);
-  assert.equal(client.cookie(), '', 'Токен не должен выдаваться неодобренному');
-});
-
-test('После одобрения админом пользователь может войти и /auth/me возвращает его профиль', async () => {
-  const u = uniqueUser('approved');
-  createdEmails.push(u.email);
-
-  // 1. регистрация
-  const userClient = createApiClient();
-  await userClient.post('/auth/register', u);
-
-  // 2. до одобрения — login падает
-  const blocked = await userClient.post('/auth/login', { email: u.email, password: u.password });
-  assert.equal(blocked.status, 403);
-
-  // 3. админ одобряет
+  // в админ-списке он виден сразу как одобренный
   const found = await findUserByEmail(admin, u.email);
   assert.ok(found);
-  const approve = await admin.patch(`/admin/users/${found.id}/approve`, { is_approved: true });
-  assert.equal(approve.status, 200);
+  assert.equal(found.is_approved, true);
+});
 
-  // 4. login теперь работает и /auth/me отдаёт пользователя
-  const ok = await userClient.post('/auth/login', { email: u.email, password: u.password });
+test('Созданный админом пользователь может сразу войти со сгенерированным паролем', async () => {
+  const u = uniqueUser('login');
+  createdEmails.push(u.email);
+
+  const created = await admin.post('/admin/users', { email: u.email, username: u.username });
+  assert.equal(created.status, 201);
+  const generatedPassword = created.data.password;
+
+  const userClient = createApiClient();
+  const ok = await userClient.post('/auth/login', { email: u.email, password: generatedPassword });
   assert.equal(ok.status, 200);
   assert.equal(ok.data.user.email, u.email);
 
@@ -79,4 +65,22 @@ test('После одобрения админом пользователь мо
   assert.equal(me.status, 200);
   assert.equal(me.data.user.email, u.email);
   assert.equal(me.data.user.role, 'user');
+});
+
+test('POST /admin/users отклоняет дубликат email с 409', async () => {
+  const u = uniqueUser('dup');
+  createdEmails.push(u.email);
+
+  const first = await admin.post('/admin/users', { email: u.email, username: u.username });
+  assert.equal(first.status, 201);
+
+  const dup = await admin.post('/admin/users', { email: u.email, username: u.username + '_2' });
+  assert.equal(dup.status, 409);
+  assert.match(dup.data.error, /уже существует/i);
+});
+
+test('POST /auth/register больше не существует (404)', async () => {
+  const client = createApiClient();
+  const res = await client.post('/auth/register', { email: 'x@y.z', username: 'x', password: '12345678' });
+  assert.equal(res.status, 404);
 });

@@ -26,18 +26,13 @@ export function AuthProvider({ children }) {
     return user;
   };
 
-  const register = async (email, username, password) => {
-    // Регистрация не выдаёт токен: аккаунт ждёт одобрения администратора.
-    return await api.post('/auth/register', { email, username, password });
-  };
-
   const logout = async () => {
     await api.post('/auth/logout');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refresh }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   );
