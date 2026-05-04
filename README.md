@@ -156,9 +156,9 @@ npm run reset      # полный сброс: удалить volumes и подн
 
 | Уровень       | Файл                                              | Что проверяется |
 |---------------|---------------------------------------------------|-----------------|
-| Unit          | `unit/auth.schema.test.js`                        | Валидация Zod-схем `registerSchema`, `userApprovalSchema` |
-| Integration   | `integration/approval-flow.test.js`               | HTTP-API: register → 403 на login → admin approve → login OK |
-| UI (Selenium) | `ui/approval-flow.test.js`                        | Браузерный сценарий: экран ожидания, ошибка входа, одобрение в админке |
+| Unit          | `unit/auth.schema.test.js`                        | Валидация Zod-схем `userCreateSchema`, `userApprovalSchema` |
+| Integration   | `integration/approval-flow.test.js`               | HTTP-API: только админ создаёт юзеров через `POST /admin/users`, ученик логинится сгенерированным паролем |
+| UI (Selenium) | `ui/approval-flow.test.js`                        | Браузерный сценарий: `/register` отсутствует, админ создаёт пользователя через модалку и видит пароль |
 
 ### Запуск тестов
 
@@ -190,10 +190,11 @@ expected_output:  "5"
 ## Маршруты API
 
 ### Auth
-- `POST /auth/register` — `{ email, username, password }`
 - `POST /auth/login` — `{ email, password }`
 - `POST /auth/logout`
 - `GET /auth/me`
+
+> Публичной регистрации нет. Учётные записи создаёт только администратор через `POST /admin/users` — backend генерирует случайный пароль и возвращает его один раз в ответе. Админ передаёт логин и пароль ученику вручную.
 
 ### Публичные/пользовательские
 - `GET /api/levels` — карта островов с прогрессом (если авторизован)
@@ -209,7 +210,10 @@ expected_output:  "5"
 - `GET|POST|PUT|DELETE /admin/tasks[/:id]` (поддерживает `?level_id=...`)
 - `POST|PUT|DELETE /admin/test-cases[/:id]`
 - `GET|POST|PUT|DELETE /admin/badges[/:id]`
-- `GET /admin/users`
+- `GET /admin/users` — список
+- `POST /admin/users` — `{ email, username, role? }` → `{ user, password }` (пароль возвращается один раз)
+- `PATCH /admin/users/:id/role|block|approve`
+- `DELETE /admin/users/:id`
 
 ## База данных — ключевые таблицы
 
@@ -272,12 +276,13 @@ expected_output:  "5"
 ## Тестовый сценарий
 
 1. Откройте http://localhost:5173
-2. Зарегистрируйтесь (например, `user@test.local` / `12345678`)
-3. Откройте первый остров — прочитайте теорию, решите все 5 задач
-4. Получите бейдж «Господин Const» после завершения острова 1
-5. Пройдите все 9 островов → получите бейдж «Асинхронный Волшебник»
-6. В личном кабинете нажмите «Получить сертификат» → скачайте PDF
-7. Войдите как админ (`admin@jsquest.local` / `admin12345`) → вкладка **Админка**: редактируйте контент, смотрите пользователей
+2. Войдите как админ (`admin@jsquest.local` / `admin12345`)
+3. **Админка → Пользователи → «+ Создать пользователя»**: введите email и имя ученика. Скопируйте сгенерированный пароль из появившейся модалки и передайте ученику.
+4. Выйдите из админа, войдите под ученическими учётными данными.
+5. Откройте первый остров — прочитайте теорию, решите все 5 задач.
+6. Получите бейдж «Господин Const» после завершения острова 1.
+7. Пройдите все 9 островов → получите бейдж «Асинхронный Волшебник».
+8. В личном кабинете нажмите «Получить сертификат» → скачайте PDF.
 
 ## Траблшутинг
 

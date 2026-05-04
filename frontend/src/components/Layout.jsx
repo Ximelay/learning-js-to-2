@@ -26,10 +26,7 @@ export default function Layout() {
               <button onClick={onLogout} className="btn btn-ghost">Выйти</button>
             </>
           ) : (
-            <>
-              <Link to="/login" className="btn btn-ghost">Вход</Link>
-              <Link to="/register" className="btn btn-primary">Регистрация</Link>
-            </>
+            <Link to="/login" className="btn btn-primary">Вход</Link>
           )}
         </div>
       </header>

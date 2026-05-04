@@ -1,6 +1,17 @@
+import { randomBytes } from 'node:crypto';
+import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { pool } from '../db/pool.js';
 import { ApiError } from '../middleware/error.js';
+
+const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+
+function generatePassword(len = 12) {
+  const bytes = randomBytes(len);
+  let out = '';
+  for (let i = 0; i < len; i++) out += PASSWORD_ALPHABET[bytes[i] % PASSWORD_ALPHABET.length];
+  return out;
+}
 
 // ========== Схемы валидации ==========
 
@@ -225,6 +236,12 @@ export async function adminDeleteBadge(req, res, next) {
 
 // ========== USERS ==========
 
+export const userCreateSchema = z.object({
+  email: z.string().email('Некорректный email').max(191),
+  username: z.string().min(2, 'Имя должно быть не короче 2 символов').max(64),
+  role: z.enum(['user', 'admin']).default('user'),
+});
+
 export const userRoleSchema = z.object({
   role: z.enum(['user', 'admin']),
 });
@@ -236,6 +253,30 @@ export const userBlockSchema = z.object({
 export const userApprovalSchema = z.object({
   is_approved: z.boolean(),
 });
+
+export async function adminCreateUser(req, res, next) {
+  try {
+    const { email, username, role } = req.body;
+    const [existing] = await pool.query(
+      'SELECT id, email, username FROM users WHERE email = ? OR username = ? LIMIT 1',
+      [email, username]
+    );
+    if (existing.length) {
+      const conflictField = existing[0].email === email ? 'email' : 'имя пользователя';
+      throw new ApiError(409, `Пользователь с таким ${conflictField} уже существует`);
+    }
+    const password = generatePassword(12);
+    const hash = await bcrypt.hash(password, 10);
+    const [r] = await pool.query(
+      'INSERT INTO users (email, username, password_hash, role, is_approved) VALUES (?, ?, ?, ?, 1)',
+      [email, username, hash, role]
+    );
+    res.status(201).json({
+      user: { id: r.insertId, email, username, role, is_approved: true, is_blocked: false },
+      password,
+    });
+  } catch (e) { next(e); }
+}
 
 export async function adminListUsers(_req, res, next) {
   try {

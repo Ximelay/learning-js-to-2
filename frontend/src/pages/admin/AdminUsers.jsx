@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import Modal from './Modal.jsx';
 
 export default function AdminUsers() {
   const { user: me } = useAuth();
@@ -8,6 +9,14 @@ export default function AdminUsers() {
   const [err, setErr] = useState('');
   const [q, setQ] = useState('');
   const [busyId, setBusyId] = useState(null);
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ email: '', username: '', role: 'user' });
+  const [createBusy, setCreateBusy] = useState(false);
+  const [createErr, setCreateErr] = useState('');
+
+  const [credentials, setCredentials] = useState(null);
+  const [copied, setCopied] = useState('');
 
   const load = () => {
     setErr('');
@@ -59,16 +68,49 @@ export default function AdminUsers() {
     withBusy(u.id, () => api.del(`/admin/users/${u.id}`));
   };
 
+  const openCreate = () => {
+    setCreateForm({ email: '', username: '', role: 'user' });
+    setCreateErr('');
+    setCreateOpen(true);
+  };
+
+  const submitCreate = async () => {
+    setCreateBusy(true); setCreateErr('');
+    try {
+      const res = await api.post('/admin/users', createForm);
+      setCreateOpen(false);
+      setCredentials(res);
+      load();
+    } catch (e) {
+      setCreateErr(e.message);
+    } finally {
+      setCreateBusy(false);
+    }
+  };
+
+  const copy = async (label, text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(label);
+      setTimeout(() => setCopied(''), 1500);
+    } catch {
+      // буфер обмена недоступен — не критично
+    }
+  };
+
   return (
     <>
       <div className="admin-bar">
         <h2>Пользователи ({items.length})</h2>
-        <input
-          placeholder="Поиск по email, имени или id"
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)', minWidth: 260 }}
-        />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            placeholder="Поиск по email, имени или id"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)', minWidth: 260 }}
+          />
+          <button className="btn btn-primary" onClick={openCreate}>+ Создать пользователя</button>
+        </div>
       </div>
       {err && <div className="error" style={{ background: 'var(--panel)', padding: 12, borderRadius: 8, marginBottom: 12 }}>{err}</div>}
       <table className="admin-table">
@@ -151,6 +193,100 @@ export default function AdminUsers() {
           )}
         </tbody>
       </table>
+
+      {createOpen && (
+        <Modal
+          title="Создать пользователя"
+          onClose={() => !createBusy && setCreateOpen(false)}
+          onSave={submitCreate}
+          saveLabel="Создать"
+          busy={createBusy}
+          width={520}
+        >
+          <div className="form" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <label>Email
+              <input
+                type="email"
+                value={createForm.email}
+                onChange={e => setCreateForm({ ...createForm, email: e.target.value })}
+                placeholder="student@example.com"
+                required
+              />
+            </label>
+            <label>Имя пользователя
+              <input
+                value={createForm.username}
+                onChange={e => setCreateForm({ ...createForm, username: e.target.value })}
+                placeholder="Имя для отображения"
+                minLength={2}
+                required
+              />
+            </label>
+            <label>Роль
+              <select
+                value={createForm.role}
+                onChange={e => setCreateForm({ ...createForm, role: e.target.value })}
+              >
+                <option value="user">user — обычный ученик</option>
+                <option value="admin">admin — администратор</option>
+              </select>
+            </label>
+            <p style={{ margin: 0, color: 'var(--muted)', fontSize: 13 }}>
+              Пароль будет сгенерирован автоматически. Он покажется один раз — скопируйте и передайте ученику.
+            </p>
+            {createErr && <div className="error">{createErr}</div>}
+          </div>
+        </Modal>
+      )}
+
+      {credentials && (
+        <Modal
+          title="Учётная запись создана"
+          onClose={() => { setCredentials(null); setCopied(''); }}
+          width={560}
+        >
+          <p style={{ marginTop: 0 }}>
+            Скопируйте данные и передайте ученику. После закрытия окна пароль будет недоступен.
+          </p>
+          <CredentialField label="Email" value={credentials.user.email} onCopy={copy} copied={copied === 'email'} copyKey="email" />
+          <CredentialField label="Имя" value={credentials.user.username} onCopy={copy} copied={copied === 'username'} copyKey="username" />
+          <CredentialField label="Пароль" value={credentials.password} onCopy={copy} copied={copied === 'password'} copyKey="password" mono />
+          <button
+            className="btn btn-ghost"
+            style={{ marginTop: 8 }}
+            onClick={() => copy('all', `Email: ${credentials.user.email}\nИмя: ${credentials.user.username}\nПароль: ${credentials.password}`)}
+          >
+            {copied === 'all' ? '✓ Скопировано' : 'Копировать всё'}
+          </button>
+        </Modal>
+      )}
     </>
+  );
+}
+
+function CredentialField({ label, value, onCopy, copied, copyKey, mono }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 4 }}>{label}</div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+        <code
+          style={{
+            flex: 1,
+            padding: '8px 12px',
+            borderRadius: 8,
+            background: 'var(--panel)',
+            border: '1px solid var(--line)',
+            fontFamily: mono ? 'ui-monospace, SFMono-Regular, monospace' : 'inherit',
+            fontSize: 14,
+            wordBreak: 'break-all',
+          }}
+        >
+          {value}
+        </code>
+        <button className="btn btn-ghost btn-sm" onClick={() => onCopy(copyKey, value)}>
+          {copied ? '✓' : 'Копировать'}
+        </button>
+      </div>
+    </div>
   );
 }

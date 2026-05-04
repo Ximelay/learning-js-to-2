@@ -5,12 +5,6 @@ import { pool } from '../db/pool.js';
 import { config } from '../config.js';
 import { ApiError } from '../middleware/error.js';
 
-export const registerSchema = z.object({
-  email: z.string().email('Некорректный email').max(191),
-  username: z.string().min(2, 'Имя должно быть не короче 2 символов').max(64),
-  password: z.string().min(8, 'Пароль должен быть не короче 8 символов').max(128),
-});
-
 export const loginSchema = z.object({
   email: z.string().email('Некорректный email'),
   password: z.string().min(1, 'Введите пароль'),
@@ -31,27 +25,6 @@ function setAuthCookie(res, token) {
     secure: config.nodeEnv === 'production',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-}
-
-export async function register(req, res, next) {
-  try {
-    const { email, username, password } = req.body;
-    const [existing] = await pool.query(
-      'SELECT id FROM users WHERE email = ? OR username = ? LIMIT 1',
-      [email, username]
-    );
-    if (existing.length) throw new ApiError(409, 'Пользователь с таким email или именем уже зарегистрирован');
-
-    const hash = await bcrypt.hash(password, 10);
-    await pool.query(
-      'INSERT INTO users (email, username, password_hash, role, is_approved) VALUES (?, ?, ?, ?, 0)',
-      [email, username, hash, 'user']
-    );
-    res.status(201).json({
-      pending: true,
-      message: 'Регистрация принята. Аккаунт будет доступен после одобрения администратором.',
-    });
-  } catch (e) { next(e); }
 }
 
 export async function login(req, res, next) {

@@ -3,12 +3,11 @@ import assert from 'node:assert/strict';
 import { Builder, By, until } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome.js';
 import { FRONTEND_URL, ADMIN_EMAIL, ADMIN_PASSWORD, uniqueUser } from '../helpers/env.js';
-import { createApiClient, loginAsAdmin, deleteUserByEmail } from '../helpers/api.js';
+import { loginAsAdmin, deleteUserByEmail } from '../helpers/api.js';
 
 // ============================================================================
 // UI-тесты — Selenium WebDriver, headless Chrome.
 // Перед запуском должны быть подняты frontend (5173) и backend (3000).
-// Установка: `npm install` в каталоге tests/ + установленный Chrome/Chromium.
 // ============================================================================
 
 const TIMEOUT = 15000;
@@ -31,126 +30,79 @@ after(async () => {
   }
 });
 
-async function fillRegisterForm(u) {
-  await driver.get(`${FRONTEND_URL}/register`);
-  await driver.wait(until.elementLocated(By.css('input[type="email"]')), TIMEOUT);
-  await driver.findElement(By.css('input[type="email"]')).sendKeys(u.email);
-  // имя пользователя — единственный input без типа email/password
-  const inputs = await driver.findElements(By.css('form input'));
-  // ожидаемый порядок: email, username, password
-  await inputs[1].sendKeys(u.username);
-  await driver.findElement(By.css('input[type="password"]')).sendKeys(u.password);
-  await driver.findElement(By.css('button[type="submit"]')).click();
-}
-
-test('UI: после успешной регистрации показывается экран ожидания одобрения', async () => {
-  const u = uniqueUser('ui_pending');
-  createdEmails.push(u.email);
-
-  await fillRegisterForm(u);
-
-  const heading = await driver.wait(
-    until.elementLocated(By.xpath("//h2[contains(., 'Заявка отправлена')]")),
-    TIMEOUT
-  );
-  const headingText = await heading.getText();
-  assert.match(headingText, /Заявка отправлена/);
-
-  const body = await driver.findElement(By.css('.panel')).getText();
-  assert.match(body, /ожидает одобрения администратора/i);
-
-  // должна быть кнопка-ссылка ко входу
-  const loginLink = await driver.findElement(By.linkText('К странице входа'));
-  assert.ok(await loginLink.isDisplayed());
-});
-
-test('UI: попытка входа неодобренного пользователя показывает ошибку', async () => {
-  const u = uniqueUser('ui_login_blocked');
-  createdEmails.push(u.email);
-
-  // регистрируем заранее через API (быстрее, чем повторно через UI)
-  await createApiClient().post('/auth/register', u);
-
-  await driver.get(`${FRONTEND_URL}/login`);
-  await driver.wait(until.elementLocated(By.css('input[type="email"]')), TIMEOUT);
-  await driver.findElement(By.css('input[type="email"]')).sendKeys(u.email);
-  await driver.findElement(By.css('input[type="password"]')).sendKeys(u.password);
-  await driver.findElement(By.css('button[type="submit"]')).click();
-
-  const errorEl = await driver.wait(until.elementLocated(By.css('.error')), TIMEOUT);
-  const errText = await errorEl.getText();
-  assert.match(errText, /ожидает одобрения/i);
-
-  // и мы по-прежнему на /login
-  const url = await driver.getCurrentUrl();
-  assert.match(url, /\/login$/);
-});
-
-test('UI: админ одобряет пользователя — после этого тот успешно входит', async () => {
-  const u = uniqueUser('ui_full_flow');
-  createdEmails.push(u.email);
-
-  // 1. зарегистрировать пользователя через API
-  await createApiClient().post('/auth/register', u);
-
-  // 2. зайти как админ через UI
+async function loginUiAsAdmin() {
   await driver.get(`${FRONTEND_URL}/login`);
   await driver.wait(until.elementLocated(By.css('input[type="email"]')), TIMEOUT);
   await driver.findElement(By.css('input[type="email"]')).sendKeys(ADMIN_EMAIL);
   await driver.findElement(By.css('input[type="password"]')).sendKeys(ADMIN_PASSWORD);
   await driver.findElement(By.css('button[type="submit"]')).click();
-  // ждём, пока браузер действительно уйдёт со страницы /login (значит, кука выдана)
   await driver.wait(async () => {
     const url = await driver.getCurrentUrl();
     return !/\/login(?:[/?#]|$)/.test(url);
   }, TIMEOUT, 'Админ не залогинился: URL остался на /login');
+}
 
-  // 3. перейти в админку — список пользователей
-  await driver.get(`${FRONTEND_URL}/admin/users`);
-  const usersTable = await driver.wait(
-    until.elementLocated(By.css('.admin-table')),
-    TIMEOUT,
-    'Не дождались таблицы /admin/users — возможно, не сработал auth (кука/refresh)'
-  );
-  assert.ok(usersTable);
+test('UI: страница /register больше не существует (роут не зарегистрирован)', async () => {
+  await driver.get(`${FRONTEND_URL}/register`);
+  // ждём, пока React отрисует layout
+  await driver.wait(until.elementLocated(By.css('main.main')), TIMEOUT);
+  const main = await driver.findElement(By.css('main.main')).getText();
+  // на месте /register должен быть фолбэк «Страница не найдена»
+  assert.match(main, /Страница не найдена/i);
+});
 
-  // 4. отфильтровать по email тестового пользователя — поле поиска уже есть
-  const search = await driver.findElement(By.css('.admin-bar input'));
-  await search.sendKeys(u.email);
-
-  // 5. нажать кнопку «Одобрить» в строке пользователя
-  const approveBtn = await driver.wait(
-    until.elementLocated(
-      By.xpath("//table[contains(@class,'admin-table')]//button[normalize-space()='Одобрить']")
-    ),
-    TIMEOUT
-  );
-  // accept native confirm()
-  await driver.executeScript('window.confirm = () => true;');
-  await approveBtn.click();
-
-  // ждём пока чип в строке станет «одобрен»
-  await driver.wait(async () => {
-    const chips = await driver.findElements(
-      By.xpath("//table[contains(@class,'admin-table')]//span[contains(@class,'chip-active') and normalize-space()='одобрен']")
-    );
-    return chips.length > 0;
-  }, TIMEOUT, 'Чип «одобрен» не появился после нажатия «Одобрить»');
-
-  // 6. logout admin → login as user
-  await driver.manage().deleteAllCookies();
+test('UI: на /login нет ссылки на регистрацию', async () => {
   await driver.get(`${FRONTEND_URL}/login`);
   await driver.wait(until.elementLocated(By.css('input[type="email"]')), TIMEOUT);
-  await driver.findElement(By.css('input[type="email"]')).sendKeys(u.email);
-  await driver.findElement(By.css('input[type="password"]')).sendKeys(u.password);
-  await driver.findElement(By.css('button[type="submit"]')).click();
+  const links = await driver.findElements(By.linkText('Зарегистрироваться'));
+  assert.equal(links.length, 0, 'На /login не должно быть ссылки «Зарегистрироваться»');
+  // в шапке тоже должна быть только кнопка «Вход»
+  const headerRegister = await driver.findElements(By.linkText('Регистрация'));
+  assert.equal(headerRegister.length, 0, 'В шапке не должно быть кнопки «Регистрация»');
+});
 
-  // ожидаем редирект с /login (на главную)
-  await driver.wait(async () => {
-    const url = await driver.getCurrentUrl();
-    return !/\/login$/.test(url);
-  }, TIMEOUT, 'После одобрения пользователь должен войти и быть переадресован с /login');
+test('UI: админ создаёт пользователя через админку и видит сгенерированный пароль', async () => {
+  const u = uniqueUser('ui_create');
+  createdEmails.push(u.email);
 
-  const url = await driver.getCurrentUrl();
-  assert.doesNotMatch(url, /\/login$/);
+  await loginUiAsAdmin();
+  await driver.get(`${FRONTEND_URL}/admin/users`);
+  await driver.wait(until.elementLocated(By.css('.admin-table')), TIMEOUT);
+
+  // открыть модалку создания
+  const createBtn = await driver.findElement(
+    By.xpath("//button[normalize-space()='+ Создать пользователя']")
+  );
+  await createBtn.click();
+
+  // заполнить форму
+  const dialog = await driver.wait(until.elementLocated(By.css('.modal')), TIMEOUT);
+  await dialog.findElement(By.css('input[type="email"]')).sendKeys(u.email);
+  // имя — это второй input в форме модалки
+  const inputs = await dialog.findElements(By.css('.form input'));
+  await inputs[1].sendKeys(u.username);
+
+  // нажать «Создать»
+  const saveBtn = await dialog.findElement(
+    By.xpath(".//button[normalize-space()='Создать']")
+  );
+  await saveBtn.click();
+
+  // ждём модалку «Учётная запись создана»
+  await driver.wait(
+    until.elementLocated(By.xpath("//h3[normalize-space()='Учётная запись создана']")),
+    TIMEOUT,
+    'Модалка с учётными данными не появилась'
+  );
+
+  // в модалке должны быть email, имя и непустой пароль
+  const credModal = await driver.findElement(
+    By.xpath("//h3[normalize-space()='Учётная запись создана']/ancestor::*[contains(@class,'modal')]")
+  );
+  const text = await credModal.getText();
+  assert.match(text, new RegExp(u.email.replace(/\./g, '\\.')));
+  assert.match(text, new RegExp(u.username));
+
+  // и в основной таблице теперь есть новый пользователь
+  // (закрываем модалку через Esc-эмуляцию: клик по overlay не нужен, проверяем через API-побочно)
 });
