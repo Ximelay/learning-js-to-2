@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import OnboardingModal from './OnboardingModal.jsx';
+//import NexNavigator from './NexNavigator.jsx';
+import AstronautGuide from './AstronautGuide.jsx';
 
 const ONBOARDING_KEY = 'js-quest-onboarding-seen';
 
@@ -10,6 +12,18 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+    // Определяем вариант сообщения для Некса
+    //const getNexVariant = () => {
+      //  if (location.pathname.includes('/tasks')) return "task";
+        //if (location.pathname.includes('/levels')) return "planet";
+       // return "default";
+    //};
+
+    const getVariant = () =>{
+        if (location.pathname.includes('/tasks')) return "task";
+        if (location.pathname.includes('/levels')) return "planet";
+        return "default"; };
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +73,11 @@ export default function Layout() {
       </main>
       <footer className="footer">JS-Квест · образовательная платформа</footer>
       <OnboardingModal open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+        {/* Космический помощник */}
+        {/*{user && <NexNavigator variant={getNexVariant()} />}*/}
+        {user && <AstronautGuide variant={getVariant()} />}
+
+
     </div>
   );
 }

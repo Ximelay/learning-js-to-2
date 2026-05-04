@@ -83,22 +83,16 @@ export default function WelcomePage() {
       </section>
 
       <section className="welcome-section">
-        <h2 className="welcome-section-title">Карта островов (предпросмотр)</h2>
+        <h2 className="welcome-section-title">Какова история?</h2>
         <p className="welcome-section-sub">
-          Это пример того, как выглядит карта прохождения. После входа здесь появятся ваши уровни
-          с прогрессом.
-        </p>
-        <div className="welcome-grid">
-          {ISLAND_PREVIEW.map(i => (
-            <div key={i.num} className="island welcome-preview-card">
-              <div className="island-num">Остров {i.num}</div>
-              <div className="island-title">{i.title}</div>
-              <div className="island-sub">{i.sub}</div>
-              <div className="island-progress"><div className="island-progress-fill" style={{ width: '0%' }} /></div>
-              <div className="island-meta"><span>0 / 5 задач</span><span>🔒 Войдите</span></div>
-            </div>
-          ))}
-        </div>
+            Многие годы назад человечество приняло решение о заселении Марса
+            и направило туда экспедицию для исследования.
+            Однако один из участников миссии заблудился в измерении именуемое как "JavaScript".
+            Для его спасения и выхода из затруднительного положения необходимо заработать достаточно Марсовской валюты "баллы"
+            и прокачать свои навыки. (как капитан говорит, код — это палочка-выручалочка, но иногда он становится лабиринтом)
+
+          </p>
+
       </section>
 
       <section className="welcome-section welcome-steps">

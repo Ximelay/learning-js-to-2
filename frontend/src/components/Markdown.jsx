@@ -17,7 +17,7 @@ function renderMarkdown(src) {
   const out = [];
   let i = 0;
   while (i < lines.length) {
-    const line = lines[i];
+    const line = lines[i].trimEnd();
 
     if (line.startsWith('```')) {
       const end = lines.indexOf('```', i + 1);
@@ -50,7 +50,7 @@ function renderMarkdown(src) {
       out.push(`<table><thead><tr>${headers}</tr></thead><tbody>${rows.join('')}</tbody></table>`);
       continue;
     }
-    if (line.trim() === '') { out.push(''); i++; continue; }
+    if (line.trim() === '') { i++; continue; }
     out.push(`<p>${renderInline(line)}</p>`);
     i++;
   }
