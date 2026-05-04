@@ -1,0 +1,184 @@
+/* ====================== ОСНОВНОЙ КОНТЕЙНЕР ====================== */
+.astronaut-guide {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 300;
+    width: 280px;
+    pointer-events: none;
+}
+
+.astronaut-guide.active {
+    animation: guide-pulse 0.6s ease;
+}
+
+/* ====================== РЕЧЬ (НАД АСТРОНАВТОМ) ====================== */
+.speech-bubble {
+    background: linear-gradient(135deg, #1e2937, #334155);
+    color: #e0f2fe;
+    padding: 14px 18px;
+    border-radius: 18px 18px 6px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 25px rgba(103, 232, 249, 0.4);
+    border: 1px solid #67e8f9;
+    font-size: 14.5px;
+    line-height: 1.45;
+    pointer-events: all;
+    cursor: pointer;
+    position: relative;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: 35px;
+    border: 9px solid transparent;
+    border-top-color: #1e2937;
+}
+
+/* ====================== АСТРОНАВТ ====================== */
+.astronaut-wrapper {
+    position: relative;
+    height: 240px;
+    display: flex;
+    justify-content: flex-end;
+    pointer-events: all;
+}
+
+.astronaut {
+    width: 170px;
+    height: 210px;
+    animation: astronaut-rotate 18s linear infinite;
+    cursor: pointer;
+}
+
+.astronaut-guide:hover .astronaut,
+.astronaut-guide.active .astronaut {
+    animation-duration: 6s;
+}
+
+/* Падающие звёзды */
+.box-of-star1,
+.box-of-star2,
+.box-of-star3,
+.box-of-star4 {
+    position: absolute;
+    width: 100%;
+    height: 400px;
+    left: 0;
+    top: -100px;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.box-of-star1 { animation: snow 7s linear infinite; }
+.box-of-star2 { animation: snow 7s -2s linear infinite; }
+.box-of-star3 { animation: snow 7s -3.5s linear infinite; }
+.box-of-star4 { animation: snow 7s -1.2s linear infinite; }
+
+@keyframes snow {
+    0%   { transform: translateY(-200px); opacity: 0; }
+    20%  { opacity: 1; }
+    100% { transform: translateY(500px); opacity: 0; }
+}
+
+@keyframes astronaut-rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes guide-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ====================== СТИЛИ АСТРОНАВТА (уменьшенные) ====================== */
+
+.astronaut .head {
+    width: 68px;
+    height: 58px;
+    position: absolute;
+    z-index: 3;
+    background: linear-gradient(90deg, #e3e8eb 0%, #e3e8eb 50%, #fbfdfa 50%, #fbfdfa 100%);
+    border-radius: 50%;
+    top: 25px;
+    left: calc(50% - 34px);
+}
+
+.astronaut .head:after {
+    content: "";
+    width: 44px;
+    height: 37px;
+    position: absolute;
+    top: calc(50% - 18.5px);
+    left: calc(50% - 22px);
+    background: linear-gradient(#15aece, #0391bf);
+    border-radius: 12px;
+}
+
+.astronaut .head:before {
+    content: "";
+    width: 12px;
+    height: 25px;
+    position: absolute;
+    top: calc(50% - 12.5px);
+    left: -4px;
+    background-color: #618095;
+    border-radius: 5px;
+    box-shadow: 65px 0px 0px #618095;
+}
+
+.astronaut .body {
+    width: 62px;
+    height: 78px;
+    position: absolute;
+    z-index: 2;
+    top: 75px;
+    left: calc(50% - 31px);
+    background: linear-gradient(90deg, #e3e8eb 0%, #e3e8eb 50%, #fbfdfa 50%, #fbfdfa 100%);
+    border-radius: 32px / 18px;
+}
+
+.astronaut .panel {
+    width: 42px;
+    height: 28px;
+    position: absolute;
+    top: 15px;
+    left: calc(50% - 21px);
+    background-color: #b7cceb;
+}
+
+.astronaut .arm {
+    width: 55px;
+    height: 24px;
+    position: absolute;
+    top: 88px;
+    z-index: 2;
+}
+
+.astronaut .arm-left  { left: 15px; background: #e3e8eb; border-radius: 0 0 0 30px; }
+.astronaut .arm-right { right: 15px; background: #fbfdfa; border-radius: 0 0 30px 0; }
+
+.astronaut .leg {
+    width: 24px;
+    height: 32px;
+    position: absolute;
+    z-index: 2;
+    bottom: 48px;
+}
+
+.astronaut .leg-left  { left: 48px; background: #e3e8eb; transform: rotate(20deg); }
+.astronaut .leg-right { right: 46px; background: #fbfdfa; transform: rotate(-20deg); }
+
+.astronaut .schoolbag {
+    width: 65px;
+    height: 92px;
+    position: absolute;
+    z-index: 1;
+    top: 85px;
+    left: calc(50% - 32px);
+    background-color: #94b7ca;
+    border-radius: 35px 35px 0 0 / 22px 22px 0 0;
+}
