@@ -5,6 +5,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { api } from '../api/client.js';
 import Markdown from '../components/Markdown.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import AstronautGuide from '../components/AstronautGuide.jsx';
 
 export default function TaskPage() {
   const { taskId } = useParams();
@@ -49,7 +50,7 @@ export default function TaskPage() {
       className="btn btn-primary"
       onClick={() => navigate(`/levels/${task.level_id}`)}
     >
-      Вернуться к острову →
+      Вернуться к планете →
     </button>
   ) : null;
 
@@ -57,14 +58,14 @@ export default function TaskPage() {
     <>
       <div style={{ marginBottom: 16 }}>
         <Link to={`/levels/${task.level_id}`} style={{ color: 'white', textDecoration: 'none' }}>
-          ← Остров {task.level_position}: {task.level_title}
+          ← Планета {task.level_position}: {task.level_title}
         </Link>
       </div>
 
       <div className="task-layout">
         <div className="task-side">
           <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700 }}>
-            Задача {task.position} · {task.points} баллов
+            Задача {task.position} · {task.points} звёзд
           </div>
           <h2 style={{ margin: '4px 0 12px' }}>{task.title}</h2>
           <Markdown text={task.description_md} className="" />
@@ -84,7 +85,7 @@ export default function TaskPage() {
           )}
         </div>
 
-        <div className="task-editor-side">
+        <div className="task-editor-side" style={{ paddingBottom: '120px' }}>
           <div className="editor-wrap">
             <CodeMirror
               value={code}
@@ -110,14 +111,14 @@ export default function TaskPage() {
               ))}
               {results.passed && !results.already_completed && (
                 <div className="new-badge-toast" style={{ background: 'linear-gradient(90deg, #2bd07e, #18a35a)', color: 'white' }}>
-                  🎉 Задача решена! +{results.earned_points} баллов
+                  🎉 Задача решена! +{results.earned_points} звёзд
                 </div>
               )}
               {results.passed && results.already_completed && (
-                <div className="test-result passed">Задача уже была решена ранее — баллы повторно не начисляются.</div>
+                <div className="test-result passed">Задача уже была решена ранее — звёзды повторно не начисляются.</div>
               )}
               {results.level_progress?.was_first_time && (
-                <div className="new-badge-toast">🏝 Остров пройден!</div>
+                <div className="new-badge-toast">🛰️ Планета пройдена!</div>
               )}
               <div>
                 {results.results.map((r, i) => (
@@ -148,6 +149,7 @@ export default function TaskPage() {
           )}
         </div>
       </div>
+        <AstronautGuide variant={results?.passed ? "success" : "task"} />
     </>
   );
 }

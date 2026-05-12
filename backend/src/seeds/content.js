@@ -24,73 +24,84 @@ export const LEVELS = [
 - \`Number\` имеет ограничения → для больших чисел использовать \`BigInt\`
 - \`null\` — явное отсутствие значения
 - \`undefined\` — неинициализированная переменная
-[Metanit](https://metanit.com/web/javascript/2.1.php "Глянь учебник")
-[Metanit](https://metanit.com/web/javascript/2.2.php)
 `.trim(),
-    tasks: [
-      {
-        position: 1, points: 10,
-        title: 'Первая переменная',
-        description_md: 'Напишите функцию `greet()`, которая возвращает строку `"Привет, мир!"`.',
-        starter_code: 'function greet() {\n  // ваш код\n}',
-        solution_code: 'function greet() { return "Привет, мир!"; }',
-        test_cases: [
-          { call_code: 'greet()', expected_output: 'Привет, мир!', description: 'Возвращает приветствие' },
-          { call_code: 'typeof greet()', expected_output: 'string', description: 'Тип возвращаемого значения — строка', is_hidden: true },
-        ],
-      },
-      {
-        position: 2, points: 10,
-        title: 'Сумма двух чисел',
-        description_md: 'Напишите функцию `sum(a, b)`, возвращающую сумму двух чисел.',
-        starter_code: 'function sum(a, b) {\n  // ваш код\n}',
-        solution_code: 'function sum(a, b) { return a + b; }',
-        test_cases: [
-          { call_code: 'sum(2, 3)', expected_output: '5', description: 'Малые числа' },
-          { call_code: 'sum(-5, 10)', expected_output: '5', description: 'С отрицательным числом' },
-          { call_code: 'sum(0, 0)', expected_output: '0', description: 'Нули', is_hidden: true },
-          { call_code: 'sum(100, 250)', expected_output: '350', description: 'Большие числа', is_hidden: true },
-        ],
-      },
-      {
-        position: 3, points: 10,
-        title: 'Определи тип',
-        description_md: 'Напишите функцию `typeName(value)`, возвращающую строку — название типа значения (используйте `typeof`).',
-        starter_code: 'function typeName(value) {\n  // ваш код\n}',
-        solution_code: 'function typeName(value) { return typeof value; }',
-        test_cases: [
-          { call_code: 'typeName(42)', expected_output: 'number', description: 'Число' },
-          { call_code: 'typeName("привет")', expected_output: 'string', description: 'Строка' },
-          { call_code: 'typeName(true)', expected_output: 'boolean', description: 'Булево' },
-          { call_code: 'typeName(undefined)', expected_output: 'undefined', description: 'undefined', is_hidden: true },
-        ],
-      },
-      {
-        position: 4, points: 10,
-        title: 'Приветствие по имени',
-        description_md: 'Напишите функцию `makeGreeting(name)`, возвращающую строку вида `"Привет, <name>!"`. Используйте шаблонные литералы.',
-        starter_code: 'function makeGreeting(name) {\n  // ваш код\n}',
-        solution_code: 'function makeGreeting(name) { return `Привет, ${name}!`; }',
-        test_cases: [
-          { call_code: 'makeGreeting("Аня")', expected_output: 'Привет, Аня!', description: 'Имя Аня' },
-          { call_code: 'makeGreeting("Олег")', expected_output: 'Привет, Олег!', description: 'Имя Олег' },
-          { call_code: 'makeGreeting("")', expected_output: 'Привет, !', description: 'Пустое имя', is_hidden: true },
-        ],
-      },
-      {
-        position: 5, points: 10,
-        title: 'Площадь прямоугольника',
-        description_md: 'Напишите функцию `area(width, height)`, возвращающую площадь прямоугольника. Объявите промежуточную переменную через `const`.',
-        starter_code: 'function area(width, height) {\n  // ваш код\n}',
-        solution_code: 'function area(w,h) { const s = w*h; return s; }',
-        test_cases: [
-          { call_code: 'area(4, 5)', expected_output: '20', description: 'Обычный случай' },
-          { call_code: 'area(1, 1)', expected_output: '1', description: 'Единичный' },
-          { call_code: 'area(0, 10)', expected_output: '0', description: 'Одна сторона = 0', is_hidden: true },
-          { call_code: 'area(7, 3)', expected_output: '21', description: 'Произвольный', is_hidden: true },
-        ],
-      },
-    ],
+      tasks: [
+          {
+              position: 1,
+              points: 10,
+              title: 'Создание переменной age',
+              description_md: 'Создайте переменную `age` и присвойте ей ваш текущий возраст. Выведите её значение в консоль.',
+              starter_code: '// Создайте переменную age здесь\n\n\n// Выведите значение переменной в консоль',
+              solution_code: 'let age = 25\n console.log(age)',
+              test_cases: [
+                  { call_code: 'typeof age', expected_output: 'number', description: 'age должна быть числом' },
+                  { call_code: 'age > 0', expected_output: 'true', description: 'Возраст должен быть положительным' },
+                  { call_code: 'Number.isInteger(age)', expected_output: 'true', description: 'Возраст должен быть целым числом' },
+                  { call_code: 'age < 120', expected_output: 'true', description: 'Возраст должен быть реалистичным' }
+              ]
+          },
+          {
+              position: 2,
+              points: 15,
+              title: 'Константа PI и площадь круга',
+              description_md: 'Создайте константу `PI` = 3.14. Создайте переменную `radius` = 5 и вычислите площадь круга (PI × radius × radius). Результат сохраните в `area`.',
+              starter_code: 'const PI = 3.14\n\n// Создайте переменную radius\n\n\n// Вычислите площадь и сохраните в area\n\n',
+              solution_code: 'const PI = 3.14\nconst radius = 5\nconst area = PI * radius * radius',
+              test_cases: [
+                  { call_code: 'area', expected_output: '78.5', description: 'Площадь должна быть 78.5' },
+                  { call_code: 'typeof PI', expected_output: 'number', description: 'PI должна быть числом' },
+                  { call_code: 'typeof area', expected_output: 'number', description: 'area должна быть числом' },
+                  { call_code: 'radius', expected_output: '5', description: 'radius должна быть равна 5' },
+                  { call_code: 'Number.isFinite(area)', expected_output: 'true', description: 'Площадь должна быть конечным числом' }
+              ]
+          },
+          {
+              position: 3,
+              points: 15,
+              title: 'Примитивные типы данных',
+              description_md: 'Создайте по одной переменной(str, num, bool, undef, nul, sym, big) для всех примитивных типов данных JavaScript и выведите их типы с помощью `typeof`.',
+              starter_code: '// Создайте переменные всех примитивных типов ниже\n\n',
+              solution_code: 'const str = "текст"\nconst num = 42\nconst bool = true\nconst undef = undefined\nconst nul = null\nconst sym = Symbol("id")\nconst big = 12345678901234567890n',
+              test_cases: [
+                  { call_code: 'typeof str', expected_output: 'string', description: 'Строка' },
+                  { call_code: 'typeof num', expected_output: 'number', description: 'Число' },
+                  { call_code: 'typeof bool', expected_output: 'boolean', description: 'Boolean' },
+                  { call_code: 'typeof undef', expected_output: 'undefined', description: 'Undefined' },
+                  { call_code: 'typeof nul', expected_output: 'object', description: 'Null (особенность JS)' },
+                  { call_code: 'typeof sym', expected_output: 'symbol', description: 'Symbol' },
+                  { call_code: 'typeof big', expected_output: 'bigint', description: 'BigInt' }
+              ]
+          },
+          {
+              position: 4,
+              points: 12,
+              title: 'Преобразование типов',
+              description_md: 'Преобразуйте:\n- строку `"100"` в число\n- число `42` в строку',
+              starter_code: '// Преобразуйте строку в число\n\n\n// Преобразуйте число в строку\n',
+              solution_code: 'const num = Number("100")\nconst str = String(42)',
+              test_cases: [
+                  { call_code: 'num', expected_output: '100', description: 'Строка "100" → число 100' },
+                  { call_code: 'str', expected_output: '42', description: 'Число 42 → строка "42"' },
+                  { call_code: 'typeof num', expected_output: 'number' },
+                  { call_code: 'typeof str', expected_output: 'string' },
+                  { call_code: 'num === 100', expected_output: 'true' },
+                  { call_code: 'str === "42"', expected_output: 'true' }
+              ]
+          },
+          {
+              position: 5,
+              points: 10,
+              title: 'Изменение значения переменной',
+              description_md: 'Создайте переменную `a = 10`. Затем измените её значение на `20`. Выведите оба значения.',
+              starter_code: 'let a = 10\n\n// Выведите значение до изменения\n\n\n// Измените значение a\n\n\n// Выведите новое значение',
+              solution_code: 'let a = 10\nconsole.log("До:", a)\na = 20\nconsole.log("После:", a)',
+              test_cases: [
+                  { call_code: 'a', expected_output: '20', description: 'Переменная a должна стать равной 20' },
+                  { call_code: 'typeof a', expected_output: 'number' },
+                  { call_code: 'a !== 10', expected_output: 'true', description: 'Значение переменной должно измениться' }
+              ]
+          }
+      ],
   },
 
   // ========================================================================

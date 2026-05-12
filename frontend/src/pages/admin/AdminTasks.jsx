@@ -104,7 +104,7 @@ export default function AdminTasks() {
       </div>
 
       <table className="admin-table">
-        <thead><tr><th>#</th><th>Название</th><th>Баллы</th><th>Тестов</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Название</th><th>Звёзды</th><th>Тестов</th><th></th></tr></thead>
         <tbody>
           {tasks.map(t => (
             <tr key={t.id}>
@@ -144,7 +144,7 @@ export default function AdminTasks() {
               <label>Позиция
                 <input type="number" value={editTask.position} onChange={e => setEditTask({ ...editTask, position: e.target.value })} />
               </label>
-              <label>Баллы
+              <label>Звёзды
                 <input type="number" value={editTask.points} onChange={e => setEditTask({ ...editTask, points: e.target.value })} />
               </label>
             </div>

@@ -36,7 +36,7 @@ export default function AdminLevels() {
   return (
     <>
       <div className="admin-bar">
-        <h2>Уровни (острова)</h2>
+        <h2>Уровни (планеты)</h2>
         <button className="btn btn-primary" onClick={() => setEdit({ ...empty, position: items.length + 1 })}>
           + Добавить уровень
         </button>

@@ -16,15 +16,15 @@ export default function IslandsPage() {
       .finally(() => setLoading(false));
   }, [user?.id]);
 
-  if (loading) return <div className="centered">Загрузка островов...</div>;
+  if (loading) return <div className="centered">Загрузка планет...</div>;
   if (err) return <div className="centered">Ошибка: {err}</div>;
 
   return (
     <div className="islands-wrap">
-      <h1 className="islands-title">🗺️ Карта островов JavaScript</h1>
+      <h1 className="islands-title">✨ Карта планет JavaScript</h1>
       <p className="islands-sub">
         {user
-          ? `Ваш прогресс: ${levels.filter(l => l.is_completed).length} из ${levels.length} островов пройдено. Всего ${user.total_score} баллов.`
+          ? `Ваш прогресс: ${levels.filter(l => l.is_completed).length} из ${levels.length} планет пройдено. Всего ${user.total_score} звёзд.`
           : 'Войдите в аккаунт, чтобы начать путешествие и сохранять прогресс.'}
       </p>
       <div className="islands-grid">
@@ -38,7 +38,7 @@ export default function IslandsPage() {
           ].filter(Boolean).join(' ');
           const content = (
             <>
-              <div className="island-num">Остров {l.position}{l.is_boss && ' · БОСС'}</div>
+              <div className="island-num">Планета {l.position}{l.is_boss && ' · БОСС'}</div>
               <div className="island-title">{l.title}</div>
               <div className="island-sub">{l.subtitle || l.description}</div>
               <div className="island-progress">

@@ -11,9 +11,9 @@ const ISLAND_PREVIEW = [
 
 const FEATURES = [
   {
-    icon: '🗺️',
-    title: '9 островов',
-    text: 'Каждый остров — отдельная тема JavaScript. Проходите по порядку и открывайте новые.',
+    icon: '🪐',
+    title: '9 планет',
+    text: 'Каждая планета — отдельная тема JavaScript. Проходите по порядку и открывайте новые.',
   },
   {
     icon: '⚡',
@@ -22,7 +22,7 @@ const FEATURES = [
   },
   {
     icon: '🏆',
-    title: 'Баллы и достижения',
+    title: 'Звёзды и достижения',
     text: 'Получайте очки за решённые задачи и собирайте значки за достижения.',
   },
   {
@@ -39,8 +39,8 @@ export default function WelcomePage() {
         <div className="welcome-hero-text">
           <h1 className="welcome-title">JS-Квест: учим JavaScript как игру</h1>
           <p className="welcome-lead">
-            Образовательная платформа, на которой вы шаг за шагом проходите острова с теорией и
-            задачами. Пишете код в встроенном редакторе, получаете моментальную проверку и баллы
+            Образовательная платформа, на которой вы шаг за шагом проходите планеты с теорией и
+            задачами. Пишете код в встроенном редакторе, получаете моментальную проверку и звёзды
             за решения.
           </p>
           <div className="welcome-cta">
@@ -53,14 +53,14 @@ export default function WelcomePage() {
         </div>
         <div className="welcome-hero-art" aria-hidden="true">
           <div className="welcome-island-preview">
-            <div className="island-num">Остров 1</div>
+            <div className="island-num">Планета 1</div>
             <div className="island-title">Переменные</div>
             <div className="island-sub">Старт путешествия</div>
             <div className="island-progress"><div className="island-progress-fill" style={{ width: '60%' }} /></div>
             <div className="island-meta"><span>3 / 5 задач</span><span>Доступно</span></div>
           </div>
           <div className="welcome-island-preview offset">
-            <div className="island-num">Остров 2</div>
+            <div className="island-num">Планета 2</div>
             <div className="island-title">Условия</div>
             <div className="island-sub">if / else / switch</div>
             <div className="island-progress"><div className="island-progress-fill" style={{ width: '20%' }} /></div>
@@ -88,7 +88,7 @@ export default function WelcomePage() {
             Многие годы назад человечество приняло решение о заселении Марса
             и направило туда экспедицию для исследования.
             Однако один из участников миссии заблудился в измерении именуемое как "JavaScript".
-            Для его спасения и выхода из затруднительного положения необходимо заработать достаточно Марсовской валюты "баллы"
+            Для его спасения и выхода из затруднительного положения необходимо заработать достаточно Марсовской валюты "звёзды"
             и прокачать свои навыки. (как капитан говорит, код — это палочка-выручалочка, но иногда он становится лабиринтом)
 
           </p>
@@ -100,9 +100,9 @@ export default function WelcomePage() {
         <ol className="welcome-steps-list">
           <li><strong>Получите логин</strong> у преподавателя — регистрация на платформе закрытая.</li>
           <li><strong>Войдите</strong> по выданным email и паролю на странице входа.</li>
-          <li><strong>Откройте первый остров</strong> и прочитайте теорию.</li>
+          <li><strong>Откройте первую планету</strong> и прочитайте теорию.</li>
           <li><strong>Решайте задачи</strong> прямо в редакторе — проверка происходит автоматически.</li>
-          <li><strong>Открывайте новые острова</strong>, набирайте баллы и значки.</li>
+          <li><strong>Открывайте новые планеты</strong>, набирайте звёзды и значки.</li>
         </ol>
         <div className="welcome-cta">
           <Link to="/login" className="btn btn-primary btn-lg">Войти</Link>

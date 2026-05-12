@@ -74,13 +74,13 @@ export default function AdminBadges() {
             </label>
             <label>Тип условия
               <select value={edit.trigger_type} onChange={e => setEdit({ ...edit, trigger_type: e.target.value })}>
-                <option value="score">По набранным баллам</option>
+                <option value="score">По набранным звёздам</option>
                 <option value="level_complete">По прохождению уровня (ID уровня)</option>
                 <option value="all_levels_complete">Все уровни пройдены</option>
               </select>
             </label>
             {edit.trigger_type !== 'all_levels_complete' && (
-              <label>Значение (баллы или ID уровня)
+              <label>Значение (звёзды или ID уровня)
                 <input type="number" value={edit.trigger_value ?? ''} onChange={e => setEdit({ ...edit, trigger_value: e.target.value })} />
               </label>
             )}

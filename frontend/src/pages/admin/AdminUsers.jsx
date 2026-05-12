@@ -117,7 +117,7 @@ export default function AdminUsers() {
         <thead>
           <tr>
             <th>ID</th><th>Email</th><th>Имя</th><th>Роль</th><th>Одобрение</th><th>Статус</th>
-            <th>Баллы</th><th>Задач</th><th>Создан</th><th>Действия</th>
+            <th>Звёзды</th><th>Задач</th><th>Создан</th><th>Действия</th>
           </tr>
         </thead>
         <tbody>
