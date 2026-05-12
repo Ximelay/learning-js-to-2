@@ -15,7 +15,7 @@ export default function Modal({ title, onClose, children, onSave, saveLabel = '�
         </div>
         {children}
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onClose}>Отмена</button>
+          <button className="btn btn-ghost" onClick={onClose}>Закрыть</button>
           {onSave && (
             <button className="btn btn-primary" onClick={onSave} disabled={busy}>
               {busy ? 'Сохраняем...' : saveLabel}

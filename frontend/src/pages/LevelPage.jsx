@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import Markdown from '../components/Markdown.jsx';
+import AstronautGuide from '../components/AstronautGuide.jsx';
 
 export default function LevelPage() {
   const { id } = useParams();
@@ -23,9 +24,9 @@ export default function LevelPage() {
   if (!prev_level_completed) {
     return (
       <div className="panel">
-        <h2 className="panel-title">🔒 Остров заблокирован</h2>
-        <p>Сначала пройдите предыдущий остров, чтобы продолжить.</p>
-        <button className="btn btn-primary" onClick={() => navigate('/')}>К карте островов</button>
+        <h2 className="panel-title">🔒 Планета заблокирована</h2>
+        <p>Сначала пройдите предыдущую планету, чтобы продолжить.</p>
+        <button className="btn btn-primary" onClick={() => navigate('/')}>К карте планет</button>
       </div>
     );
   }
@@ -34,7 +35,7 @@ export default function LevelPage() {
     <>
       <div className="level-head">
         <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 700 }}>
-          Остров {level.position}{level.is_boss ? ' · ФИНАЛЬНЫЙ БОСС' : ''}
+          Планета {level.position}{level.is_boss ? ' · ФИНАЛЬНЫЙ БОСС' : ''}
         </div>
         <h1 style={{ margin: '4px 0' }}>{level.title}</h1>
         <p style={{ color: 'var(--muted)', margin: 0 }}>{level.subtitle || level.description}</p>
@@ -53,7 +54,7 @@ export default function LevelPage() {
               <div className="task-card-title">{t.title}</div>
               <div className="task-card-pts">
                 {t.status === 'completed' ? '✓ решено' : (t.is_unlocked ? 'Доступно' : '🔒 Заблокировано')}
-                {' · '}{t.points} баллов
+                {' · '}{t.points} звёзд
               </div>
             </>
           );
@@ -62,6 +63,7 @@ export default function LevelPage() {
             : <div key={t.id} className={classes}>{inner}</div>;
         })}
       </div>
+        <AstronautGuide variant="planet" levelId={Number(id)} />
     </>
   );
 }

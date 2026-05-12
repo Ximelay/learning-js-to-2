@@ -44,12 +44,12 @@ export default function ProfilePage() {
 
       <div className="profile-grid">
         <div className="panel">
-          <h3 className="panel-title">Прогресс по островам</h3>
+          <h3 className="panel-title">Прогресс по планетам</h3>
           {level_progress.map(l => (
             <div key={l.level_id} className="progress-row">
               <div style={{ flex: 1.3 }}>
                 <div style={{ fontWeight: 600 }}>
-                  {l.is_boss ? '👑 ' : ''}Остров {l.position}: {l.title}
+                  {l.is_boss ? '👑 ' : ''}Планета {l.position}: {l.title}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--muted)' }}>
                   {l.tasks_completed} / {l.total_tasks} задач
@@ -78,7 +78,7 @@ export default function ProfilePage() {
               )
             ) : (
               <p style={{ color: 'var(--muted)' }}>
-                Сертификат станет доступен после прохождения всех островов.
+                Сертификат станет доступен после прохождения всех планет.
               </p>
             )}
           </div>
